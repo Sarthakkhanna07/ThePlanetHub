@@ -38,10 +38,11 @@ Whether you're a researcher, student, investor, or planetary engineer, The Plane
   - 🧾 PostgreSQL Database with RLS (Row Level Security)
   - 🗃️ File Storage for document uploads
 
-### 🤖 AI/ML (Planned)
+### 🤖 AI/ML 
+- AI/ML model & community-based validation scoring of research papers
 - LLM-based paper summaries
-- Weekly AI-generated ideas
-- AI & community-based validation scoring
+- Weekly AI-generated ideas to work on by the community
+
 
 ---
 
