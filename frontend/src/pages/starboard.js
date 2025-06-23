@@ -1,121 +1,110 @@
+"use client";
+import { useState } from "react";
 import Head from "next/head";
 
 export default function Starboard() {
-  const theories = [
-    {
-      title: "Quantum Cooling for Urban Heat Islands",
-      author: "Ayesha Rao",
-      summary:
-        "Uses nanomaterials to passively cool rooftops in dense Indian cities using quantum tunneling.",
-      stars: 92,
-    },
-    {
-      title: "BioLight: Trees That Emit Light",
-      author: "Ritik Sharma",
-      summary:
-        "Gene-edited banyan trees that glow in the dark using bioluminescence to reduce streetlight power demand.",
-      stars: 78,
-    },
-    {
-      title: "Atmospheric Carbon Vacuum Tower",
-      author: "Dr. Meenakshi Iyer",
-      summary:
-        "Ionic towers designed to extract CO₂ and convert it into bricks, tested in Delhi smog zones.",
-      stars: 108,
-    },
-  ];
+  const [selectedDuration, setSelectedDuration] = useState("All Time");
 
-  const missions = [
-    {
-      name: "WaterZero",
-      tag: "#Climate #Funded",
-      status: "In Pilot Phase",
-      description:
-        "A low-cost graphene membrane that filters 99% of microplastics — tested in 3 Indian districts.",
-    },
-    {
-      name: "SkyCell",
-      tag: "#Space #Deployed",
-      status: "Active Satellite",
-      description:
-        "An open-source nanosatellite monitoring Himalayan glacier melt. Data feeds into ML climate models.",
-    },
-  ];
-
-  const leaders = [
-    { name: "Zara Mehta", points: 1230 },
-    { name: "Ayaan Khan", points: 1175 },
-    { name: "Aryan Patel", points: 1102 },
+  const leaderboardData = [
+    { rank: 1, name: "Dr. Anya Sharma", score: 95, rating: 4.9 },
+    { rank: 2, name: "Team Orion", score: 92, rating: 4.8 },
+    { rank: 3, name: "Ethan Carter", score: 90, rating: 4.7 },
+    { rank: 4, name: "Dr. Ben Carter", score: 88, rating: 4.6 },
+    { rank: 5, name: "Team Nova", score: 85, rating: 4.5 },
+    { rank: 6, name: "Olivia Bennett", score: 82, rating: 4.4 },
+    { rank: 7, name: "Dr. Liam Walker", score: 80, rating: 4.3 },
+    { rank: 8, name: "Team Galaxy", score: 78, rating: 4.2 },
+    { rank: 9, name: "Sophia Hayes", score: 75, rating: 4.1 },
+    { rank: 10, name: "Dr. Noah Evans", score: 72, rating: 4.0 },
   ];
 
   return (
     <>
       <Head>
-        <title>Starboard | The Planet Hub</title>
+        <title>Starboard - The Planet HUB</title>
+        <link rel="icon" href="data:image/x-icon;base64," />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
+        />
       </Head>
 
-      <section className="min-h-screen bg-gradient-to-b from-black to-blue-950 text-white px-6 py-20">
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-6">
-          ⭐ Starboard
-        </h1>
-        <p className="text-lg text-center max-w-3xl mx-auto mb-12">
-          The brightest ideas and boldest missions from across the galaxy of minds on The Planet Hub.
-        </p>
+      <div
+        className="min-h-screen bg-black text-white px-6 py-10"
+        style={{
+          fontFamily: '"Space Grotesk", "Noto Sans", sans-serif',
+        }}
+      >
+        <div className="max-w-5xl mx-auto">
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold">🌟 Starboard Leaderboard</h1>
+            <p className="text-gray-400 mt-1 text-sm">
+              Recognizing top contributors and researchers accelerating planetary progress.
+            </p>
+          </div>
 
-        {/* Theories Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-semibold mb-4">🧠 Top-Rated Theories</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {theories.map((t, i) => (
-              <div
-                key={i}
-                className="bg-blue-900/30 border border-blue-700 p-6 rounded-xl shadow hover:bg-blue-800/30 transition"
+          {/* Tabs */}
+          <div className="flex gap-6 border-b border-gray-700 mb-6">
+            <button className="border-b-2 border-blue-500 text-white py-2 text-sm font-semibold">
+              Top Performers
+            </button>
+            <button className="text-gray-500 py-2 text-sm font-medium hover:text-white">
+              Top Teams
+            </button>
+            <button className="text-gray-500 py-2 text-sm font-medium hover:text-white">
+              Top Researchers
+            </button>
+          </div>
+
+          {/* Duration Toggle */}
+          <div className="flex bg-[#1a1a1a] rounded-lg p-1 mb-6 text-sm font-medium text-gray-400">
+            {["Weekly", "Monthly", "All Time"].map((label) => (
+              <label
+                key={label}
+                className={`flex-1 text-center py-2 rounded-lg cursor-pointer transition-all ${
+                  selectedDuration === label
+                    ? "bg-[#111b22] text-white shadow-md"
+                    : "hover:text-white"
+                }`}
               >
-                <h3 className="text-lg font-bold">{t.title}</h3>
-                <p className="text-sm text-gray-300 mt-2">{t.summary}</p>
-                <div className="mt-4 flex justify-between text-sm text-gray-400">
-                  <span>👩‍🔬 {t.author}</span>
-                  <span>⭐ {t.stars} stars</span>
-                </div>
-              </div>
+                <input
+                  type="radio"
+                  name="duration"
+                  value={label}
+                  className="hidden"
+                  checked={selectedDuration === label}
+                  onChange={() => setSelectedDuration(label)}
+                />
+                {label}
+              </label>
             ))}
           </div>
-        </div>
 
-        {/* Missions Section */}
-        <div className="mb-16">
-          <h2 className="text-2xl font-semibold mb-4">🚀 Breakthrough Missions</h2>
-          <div className="grid md:grid-cols-2 gap-6">
-            {missions.map((m, i) => (
-              <div
-                key={i}
-                className="bg-blue-900/30 border border-green-600 p-6 rounded-xl hover:bg-blue-800/30 transition"
-              >
-                <h3 className="text-lg font-bold">{m.name}</h3>
-                <span className="text-xs text-green-400">{m.tag}</span>
-                <p className="text-sm text-gray-300 mt-2">{m.description}</p>
-                <p className="text-xs text-gray-400 mt-2">Status: {m.status}</p>
-              </div>
-            ))}
+          {/* Leaderboard Table */}
+          <div className="overflow-x-auto">
+            <table className="min-w-full table-auto bg-[#0f0f0f] border border-gray-700 text-left text-sm text-gray-300">
+              <thead className="bg-[#1f1f1f] text-gray-100">
+                <tr>
+                  <th className="px-4 py-3">Rank</th>
+                  <th className="px-4 py-3">Contributor</th>
+                  <th className="px-4 py-3">Impact Score</th>
+                  <th className="px-4 py-3">Community Rating</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboardData.map((entry) => (
+                  <tr key={entry.rank} className="border-t border-gray-800 hover:bg-[#1a1a1a] transition">
+                    <td className="px-4 py-3">{entry.rank}</td>
+                    <td className="px-4 py-3 text-white font-medium">{entry.name}</td>
+                    <td className="px-4 py-3">{entry.score}</td>
+                    <td className="px-4 py-3">{entry.rating}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-
-        {/* Leaderboard Section */}
-        <div className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4">🏅 Leader Hall</h2>
-          <ul className="space-y-3">
-            {leaders.map((user, i) => (
-              <li
-                key={i}
-                className="bg-blue-900/30 p-4 rounded-xl flex justify-between items-center border border-yellow-500"
-              >
-                <span>{i + 1}. {user.name}</span>
-                <span className="text-sm text-yellow-300">Impact Score: {user.points}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </section>
+      </div>
     </>
   );
 }

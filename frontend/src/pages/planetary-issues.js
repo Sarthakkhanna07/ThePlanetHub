@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
 import Link from 'next/link';
+import Head from "next/head";
 
 export default function PlanetaryIssuesHome() {
   const [categories, setCategories] = useState([]);
@@ -17,20 +18,25 @@ export default function PlanetaryIssuesHome() {
   }, []);
 
   return (
-    <div className="p-6 bg-black text-white min-h-screen">
-      <h1 className="text-4xl font-bold mb-6">🌍 Planetary Categories</h1>
+    <>
+      <Head>
+        <title>Planetary Issues | The Planet Hub</title>
+      </Head>
+      <div className="p-6 bg-black text-white min-h-screen">
+        <h1 className="text-4xl font-bold mb-6">🌍 Planetary Categories</h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {categories.map((cat) => (
-          <Link key={cat.id} href={`/planetary-issues/${encodeURIComponent(cat.short_code)}`}>
-            <div className="bg-gray-900 hover:bg-purple-800 p-4 rounded-lg transition cursor-pointer">
-              <div className="text-3xl">{cat.icon_url}</div>
-              <h2 className="text-lg font-semibold mt-2">{cat.name}</h2>
-              <p className="text-sm text-gray-400">{cat.description}</p>
-            </div>
-          </Link>
-        ))}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {categories.map((cat) => (
+            <Link key={cat.id} href={`/planetary-issues/${encodeURIComponent(cat.short_code)}`}>
+              <div className="bg-gray-900 hover:bg-purple-800 p-4 rounded-lg transition cursor-pointer">
+                <div className="text-3xl">{cat.icon_url}</div>
+                <h2 className="text-lg font-semibold mt-2">{cat.name}</h2>
+                <p className="text-sm text-gray-400">{cat.description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
