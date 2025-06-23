@@ -1,5 +1,6 @@
 import Head from "next/head";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function LaunchPad() {
   return (
@@ -16,12 +17,12 @@ export default function LaunchPad() {
           >
             Make New Issue
           </a>
-          <a
+          <Link
             href="/launchpad/new" // TODO: Replace with your actual page
             className="block w-full text-center py-3 px-6 rounded-lg bg-blue-700 hover:bg-blue-800 font-semibold text-lg transition"
           >
             Submit Research
-          </a>
+          </Link>
         </div>
       </section>
     </>

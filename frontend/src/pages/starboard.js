@@ -23,10 +23,6 @@ export default function Starboard() {
       <Head>
         <title>Starboard - The Planet HUB</title>
         <link rel="icon" href="data:image/x-icon;base64," />
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700;900&family=Space+Grotesk:wght@400;500;700&display=swap"
-        />
       </Head>
 
       <div

@@ -42,7 +42,7 @@ export default function Central() {
                 {
                   icon: "🧑‍🚀",
                   title: "New Mission Member",
-                  detail: "Joined 'Project Eden' for self-sustaining exoplanet ecosystems.",
+                  detail: "Joined &apos;Project Eden&apos; for self-sustaining exoplanet ecosystems.",
                   author: "Dr. Noah Bennett, Astrobiologist",
                 },
                 {
@@ -106,7 +106,7 @@ export default function Central() {
                 <p className="text-white font-medium">
                   Project Nova <span className="text-sm text-blue-400 ml-2">View Mission</span>
                 </p>
-                <p className="text-sm text-gray-400">Contributed to the 'Project Nova' mission.</p>
+                <p className="text-sm text-gray-400">Contributed to the &apos;Project Nova&apos; mission.</p>
               </li>
             </ul>
           </div>
