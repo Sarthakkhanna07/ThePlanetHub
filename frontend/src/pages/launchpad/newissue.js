@@ -1,5 +1,5 @@
 // pages/launchpad/newissue.jsx
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/router";
 import Head from "next/head";
 import { supabase } from "../../lib/supabaseClient";
@@ -43,22 +43,12 @@ export default function NewIssue() {
     };
   }, []);
 
-  // 2) Once session known and if no session, redirect to login
-  useEffect(() => {
-    if (!loadingSession) {
-      if (!session) {
-        router.push("/login");
-      } else {
-        // Optionally ensure user row exists here if not done elsewhere
-        ensureUserRowExists();
-      }
-    }
-  }, [loadingSession, session, router]);
-
   // Ensure user row in 'users' table to avoid FK errors
-  const ensureUserRowExists = async () => {
+  const ensureUserRowExists = useCallback(async () => {
     try {
-      const user = session.user;
+      const user = session?.user;
+      if (!user) return;
+      
       const { data: existing, error: selectErr } = await supabase
         .from("users")
         .select("id")
@@ -87,7 +77,19 @@ export default function NewIssue() {
     } catch (err) {
       console.error("Unexpected error in ensureUserRowExists:", err);
     }
-  };
+  }, [session]);
+
+  // 2) Once session known and if no session, redirect to login
+  useEffect(() => {
+    if (!loadingSession) {
+      if (!session) {
+        router.push("/login");
+      } else {
+        // Optionally ensure user row exists here if not done elsewhere
+        ensureUserRowExists();
+      }
+    }
+  }, [loadingSession, session, router, ensureUserRowExists]);
 
   // 3) Fetch categories after mount
   useEffect(() => {

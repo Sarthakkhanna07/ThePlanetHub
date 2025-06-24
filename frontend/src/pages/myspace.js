@@ -72,7 +72,7 @@ export default function MySpace() {
     };
 
     fetchUserData();
-  }, []);
+  }, [router]);
 
   if (!user || !stats) return <div className="text-white p-8">Loading My Space...</div>;
 
@@ -85,7 +85,7 @@ export default function MySpace() {
       <section className="min-h-screen bg-black text-white px-6 py-20">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-2">🌌 Welcome, {user.user_metadata?.full_name || user.email}</h1>
-          <p className="text-lg text-gray-300">Here’s Your Space</p>
+          <p className="text-lg text-gray-300">Here&apos;s Your Space</p>
         </div>
 
         <div className="grid md:grid-cols-4 gap-6 text-center mb-16">

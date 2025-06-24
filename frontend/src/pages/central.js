@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/router";
+import Image from "next/image";
 import { supabase } from "../lib/supabaseClient";
 
 export default function Central() {
@@ -122,7 +123,7 @@ export default function Central() {
                 )}
               </div>
             </div>
-            <img
+            <Image
               src="/Starlord.png"
               alt="Planet Glow"
               width={120}
