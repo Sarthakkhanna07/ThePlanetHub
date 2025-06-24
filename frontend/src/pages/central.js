@@ -1,34 +1,137 @@
 import Head from "next/head";
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { supabase } from "../lib/supabaseClient";
 
 export default function Central() {
+  const [session, setSession] = useState(null);
+  const [trendingIssues, setTrendingIssues] = useState([]);
+  const [recentResearch, setRecentResearch] = useState([]);
+  const [featuredResearch, setFeaturedResearch] = useState(null);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    getSession();
+    // Listen to auth changes
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+    return () => {
+      listener.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    // Fetch trending issues (latest 2)
+    const fetchTrending = async () => {
+      const { data, error } = await supabase
+        .from("planetary_issues")
+        .select("id, title, unique_code, description")
+        .order("created_at", { ascending: false })
+        .limit(2);
+      if (error) console.error("Error fetching trending issues:", error);
+      else setTrendingIssues(data || []);
+    };
+    // Fetch recent research (latest 3)
+    const fetchRecentResearch = async () => {
+      const { data, error } = await supabase
+        .from("research_submissions")
+        .select("id, title, created_at")
+        .order("created_at", { ascending: false })
+        .limit(3);
+      if (error) console.error("Error fetching recent research:", error);
+      else setRecentResearch(data || []);
+    };
+    // Fetch featured research (latest 1)
+    const fetchFeatured = async () => {
+      const { data, error } = await supabase
+        .from("research_submissions")
+        .select("id, title, summary, user_id")
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+      if (error && error.code !== "PGRST116") console.error("Error fetching featured research:", error);
+      else if (data) setFeaturedResearch(data);
+    };
+    fetchTrending();
+    fetchRecentResearch();
+    fetchFeatured();
+  }, []);
+
+  const handlePublish = () => {
+    // If not logged in, redirect to login
+    if (!session) router.push("/login");
+    else router.push("/launch-pad/new");
+  };
+  const handleJoin = () => {
+    router.push("/planetary-issues");
+  };
+  const handleShareResource = () => {
+    router.push("/resources");
+  };
+  const handleFindResource = () => {
+    router.push("/resources");
+  };
+
   return (
     <>
       <Head>
         <title>Central Hub | The Planet Hub</title>
       </Head>
-
       <main className="min-h-screen bg-black text-white px-6 py-10 font-sans">
         <section className="max-w-6xl mx-auto space-y-12">
 
           {/* Hero */}
-          <div className="bg-[#0d0d0d] p-8 rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="bg-gray-900 p-8 rounded-xl shadow-lg flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome back, Commander</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                {session ? "Welcome back, Commander" : "Welcome, Commander"}
+              </h1>
               <p className="text-gray-400 max-w-lg">
                 Stay informed and inspired by the latest planetary engineering missions and research breakthroughs.
               </p>
-              <button className="mt-4 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg">
-                View Profile
-              </button>
+              <div className="mt-4">
+                {session ? (
+                  <button
+                    onClick={() => router.push('/myspace')}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                  >
+                    View Profile
+                  </button>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => router.push('/login')}
+                      className="mr-4 px-6 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg"
+                    >
+                      Log In
+                    </button>
+                    <button
+                      onClick={() => router.push('/signup')}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg"
+                    >
+                      Sign Up
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             <img
-              src="/planet-glow.jpg"
+              src="/Starlord.png"
               alt="Planet Glow"
-              className="w-full md:w-80 rounded-lg object-cover"
+              width={120}
+              height={120}
+              className="w-32 h-32 md:w-40 md:h-40 rounded-lg object-cover"
             />
           </div>
 
-          {/* Live Feed */}
+          {/* Live Feed (demo) */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Live Activity Feed</h2>
             <div className="space-y-4">
@@ -42,7 +145,7 @@ export default function Central() {
                 {
                   icon: "🧑‍🚀",
                   title: "New Mission Member",
-                  detail: "Joined &apos;Project Eden&apos; for self-sustaining exoplanet ecosystems.",
+                  detail: "Joined 'Project Eden' for self-sustaining exoplanet ecosystems.",
                   author: "Dr. Noah Bennett, Astrobiologist",
                 },
                 {
@@ -52,7 +155,7 @@ export default function Central() {
                   author: "Dr. Olivia Hayes, Environmental Scientist",
                 },
               ].map((feed, i) => (
-                <div key={i} className="bg-[#0d0d0d] p-4 rounded-lg flex gap-4 items-start">
+                <div key={i} className="bg-gray-900 p-4 rounded-lg flex gap-4 items-start">
                   <div className="text-2xl">{feed.icon}</div>
                   <div>
                     <p className="font-medium">{feed.title}</p>
@@ -68,94 +171,92 @@ export default function Central() {
           <div>
             <h2 className="text-xl font-semibold mb-4">Trending Planetary Missions</h2>
             <div className="grid md:grid-cols-2 gap-6">
-              {[
-                {
-                  title: "The Global Water Crisis",
-                  desc: "Explore research on water scarcity solutions on Earth and beyond.",
-                  img: "/planet-card1.jpg",
-                },
-                {
-                  title: "Advanced Materials for Space Habitats",
-                  desc: "Cutting-edge materials for durable, sustainable extraterrestrial habitats.",
-                  img: "/planet-card2.jpg",
-                },
-              ].map((mission, i) => (
-                <div key={i} className="bg-[#0d0d0d] rounded-lg overflow-hidden shadow-md">
-                  <img src={mission.img} alt={mission.title} className="h-40 w-full object-cover" />
-                  <div className="p-4">
-                    <p className="text-sm text-blue-400 uppercase">Featured Mission</p>
-                    <h3 className="text-lg font-semibold mb-1">{mission.title}</h3>
-                    <p className="text-sm text-gray-400">{mission.desc}</p>
-                  </div>
-                </div>
-              ))}
+              {trendingIssues.length === 0 ? (
+                <p className="text-gray-400">No trending issues yet.</p>
+              ) : (
+                trendingIssues.map((issue) => (
+                  <Link key={issue.id} href={`/issues/${issue.id}`}> 
+                    <div className="cursor-pointer bg-gray-900 rounded-lg overflow-hidden shadow-md">
+                      {/* optional image or icon */}
+                      <div className="p-4">
+                        <p className="text-sm text-blue-400 uppercase">Trending Issue</p>
+                        <h3 className="text-lg font-semibold mb-1">{issue.title}</h3>
+                        <p className="text-sm text-gray-400">{issue.description || ''}</p>
+                      </div>
+                    </div>
+                  </Link>
+                ))
+              )}
             </div>
           </div>
 
           {/* Recent Contributions */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Recent Contributions</h2>
-            <ul className="space-y-3">
-              <li className="bg-[#0d0d0d] p-4 rounded-lg">
-                <p className="text-white font-medium">
-                  Martian Soil Data <span className="text-sm text-blue-400 ml-2">View Dataset</span>
-                </p>
-                <p className="text-sm text-gray-400">Uploaded a new dataset on Martian soil composition.</p>
-              </li>
-              <li className="bg-[#0d0d0d] p-4 rounded-lg">
-                <p className="text-white font-medium">
-                  Project Nova <span className="text-sm text-blue-400 ml-2">View Mission</span>
-                </p>
-                <p className="text-sm text-gray-400">Contributed to the &apos;Project Nova&apos; mission.</p>
-              </li>
-            </ul>
+            {recentResearch.length === 0 ? (
+              <p className="text-gray-400">No recent research submissions yet.</p>
+            ) : (
+              <ul className="space-y-3">
+                {recentResearch.map((res) => (
+                  <li key={res.id} className="bg-gray-900 p-4 rounded-lg flex justify-between items-center">
+                    <Link href={`/research/${res.id}`}>
+                      <span className="text-white font-medium hover:underline cursor-pointer">{res.title}</span>
+                    </Link>
+                    <span className="text-sm text-gray-400">{new Date(res.created_at).toLocaleDateString()}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
-          {/* Featured Research */}
+          {/* Featured Research Spotlight */}
           <div>
             <h2 className="text-xl font-semibold mb-4">Featured Research Spotlight</h2>
-            <div className="bg-[#0d0d0d] rounded-lg overflow-hidden md:flex shadow-md">
-              <img src="/planet-spotlight.jpg" alt="Spotlight" className="w-full md:w-1/2 object-cover" />
-              <div className="p-6">
-                <h3 className="text-lg font-bold mb-1">Terraforming Strategies for Exoplanets</h3>
-                <p className="text-sm text-gray-400 mb-2">Dr. Evelyn Reed</p>
-                <p className="text-sm text-gray-300">
-                  A groundbreaking study on terraforming techniques for habitable exoplanets.
-                </p>
-                <button className="mt-4 text-blue-400 hover:underline text-sm">Read Full Research</button>
-              </div>
-            </div>
+            {featuredResearch ? (
+              <Link href={`/research/${featuredResearch.id}`}> 
+                <div className="cursor-pointer bg-gray-900 rounded-lg overflow-hidden md:flex shadow-md">
+                  {/* optional image if available */}
+                  <div className="p-6 flex-1">
+                    <h3 className="text-lg font-bold mb-1">{featuredResearch.title}</h3>
+                    {/* summary might be long; show excerpt */}
+                    <p className="text-sm text-gray-300 mb-2">
+                      {featuredResearch.summary?.slice(0, 150) || ""}...
+                    </p>
+                    <button className="mt-2 text-blue-400 hover:underline text-sm">Read Full Research</button>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <p className="text-gray-400">No featured research at the moment.</p>
+            )}
           </div>
 
           {/* Quick Access */}
           <div className="flex flex-wrap gap-4 justify-between mt-10">
-            <button className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg">
-              Start a Mission
+            <button
+              onClick={handlePublish}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg"
+            >
+              Publish Research
             </button>
-            <button className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-lg">
+            <button
+              onClick={handleShareResource}
+              className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-lg"
+            >
               Share a Resource
             </button>
-            <button className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg">
-              Join a Mission
+            <button
+              onClick={handleJoin}
+              className="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg"
+            >
+              See Issues
             </button>
-            <button className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-lg">
+            <button
+              onClick={handleFindResource}
+              className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2 rounded-lg"
+            >
               Find a Resource
             </button>
-          </div>
-
-          {/* Mission Updates */}
-          <div className="mt-12">
-            <h2 className="text-xl font-semibold mb-4">Mission Updates</h2>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="bg-[#0d0d0d] p-4 rounded-lg">
-                <p className="text-sm text-gray-400">🚀 Mission Status</p>
-                <p className="text-white font-medium">Project Nova progress at 75%</p>
-              </div>
-              <div className="bg-[#0d0d0d] p-4 rounded-lg">
-                <p className="text-sm text-gray-400">🧭 Mission Planning</p>
-                <p className="text-white font-medium">Next phase scheduled: Project Eden</p>
-              </div>
-            </div>
           </div>
 
         </section>

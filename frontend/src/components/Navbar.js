@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { useRouter } from "next/router";
+import { supabase } from "../lib/supabaseClient"; // Ensure this path is correct
 
 const navLinks = [
   { name: "Central hub", href: "/central" },
@@ -16,6 +17,7 @@ const navLinks = [
 export default function Navbar() {
   const navRef = useRef(null);
   const [scrolled, setScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -24,6 +26,20 @@ export default function Navbar() {
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    // Check if user is logged in
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setLoggedIn(!!session);
+    });
+
+    // Listen to login/logout changes
+    const { data: listener } = supabase.auth.onAuthStateChange((event, session) => {
+      setLoggedIn(!!session);
+    });
+
+    return () => listener?.subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -38,6 +54,11 @@ export default function Navbar() {
       });
     }
   }, [scrolled]);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push("/login");
+  };
 
   return (
     <nav
@@ -70,6 +91,24 @@ export default function Navbar() {
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Right: Login or Logout */}
+      <div>
+        {loggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="text-white font-semibold px-4 py-2 border border-gray-600 rounded-md hover:bg-white hover:text-black transition-all duration-200"
+          >
+            Logout
+          </button>
+        ) : (
+          <Link href="/login" legacyBehavior>
+            <a className="text-white font-semibold px-4 py-2 border border-gray-600 rounded-md hover:bg-white hover:text-black transition-all duration-200">
+              Login
+            </a>
+          </Link>
+        )}
       </div>
     </nav>
   );

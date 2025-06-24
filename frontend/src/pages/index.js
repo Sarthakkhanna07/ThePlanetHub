@@ -18,7 +18,7 @@ export default function Home() {
         <title>The Planet HUB</title>
         <meta name="description" content="Research to Startup | Made in India, for India | For Planetary Engineers" />
       </Head>
-
+      <div className="mb-4"></div>
       <main className="min-h-screen bg-black text-white">
         {/* Hero Section */}
         <section className="h-screen bg-cover bg-center flex flex-col justify-center items-center text-center px-6" style={{ backgroundImage: "url('/earth-bg.jpg')" }}>
